@@ -68,7 +68,7 @@ async function update(req, res) {
             },
             { runValidators: true },
             function (err, user) {
-                if (err) return res.send(err)
+                if (err) return res.json({ Message: err.message })
                 return res.json({
                     Message: `User by id = ${req.params.userId} updated.`,
                 })
