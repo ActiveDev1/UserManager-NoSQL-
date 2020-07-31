@@ -13,20 +13,15 @@ const User = new Schema(
         username: {
             type: String,
             minlength: [5, 'Username must have at last 5 character.'],
-            required: [true, 'username required'],
+            required: [true, 'Username required'],
         },
         age: {
             type: Number,
-            required: [true, 'age required'],
+            required: [true, 'Age required'],
         },
     },
-    { versionKey: false }
+    { versionKey: false ,validateBeforeSave:true}
 )
 
 
 module.exports = mongoose.model('User', User)
-
-
-// user.Schema.path('name').validate(function (value) {
-//     return value
-// }, 'Name must have at last 3 character.')
