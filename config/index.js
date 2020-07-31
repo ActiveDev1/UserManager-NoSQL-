@@ -9,6 +9,10 @@ module.exports = {
             PASSWORD: process.env.MYSQL_PASS || '',
             DB: process.env.MYSQL_DB || 'Nodedb',
         },
-        mongodb: process.env.MONGODB_URI || 'mongodb://localhost:27017/NodeDB',
+        mongodb: {
+            HOST: process.env.MONGO_HOST || 'localhost',
+            PORT:process.env.MONGO_PORT ||  27017,
+            DB: process.env.MONGO_DB ||'NodeDB',
+        },
     },
 }
