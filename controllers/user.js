@@ -58,18 +58,19 @@ async function findOne(req, res) {
 async function update(req, res) {
     try {
         await User.findOneAndUpdate(
-            req.params.userId,
-            {$set:{
-                name:req.body.name,
-                username:req.body.username,
-                age:req.body.age,
-            }},
+            {_id:req.params.userId},
+            {
+                $set: {
+                    name: req.body.name,
+                    username: req.body.username,
+                    age: req.body.age,
+                },
+            },
             { runValidators: true },
             function (err, user) {
                 if (err) return res.send(err)
                 return res.json({
                     Message: `User by id = ${req.params.userId} updated.`,
-                    Result:user
                 })
             }
         )
