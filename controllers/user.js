@@ -1,4 +1,7 @@
 const User = require('../models/user')
+const mongoose = require('mongoose')
+const { json } = require('body-parser')
+const { use } = require('../routes/user')
 
 async function create(req, res) {
     if (!req.body) {
@@ -11,7 +14,7 @@ async function create(req, res) {
 
     try {
         await user.save(function (err) {
-            if (err) return next(err)
+            if (err) return res.send(err)
             return res.json({
                 Message: `User ${req.body.username} Created successfully`,
             })
@@ -26,7 +29,7 @@ async function create(req, res) {
 
 async function findAll(req, res) {
     try {
-        await User.findAll(function (err, user) {
+        await User.find(function (err, user) {
             if (err) return next(err)
             return res.json(user)
         })
@@ -40,8 +43,8 @@ async function findAll(req, res) {
 
 async function findOne(req, res) {
     try {
-        await User.findById(req.params.id, function (err, user) {
-            if (err) return next(err)
+        await User.find({ _id: req.params.userId }, function (err, user) {
+            if (err) return res.send(err)
             return res.json(user)
         })
     } catch (err) {
@@ -61,13 +64,22 @@ async function findOne(req, res) {
 }
 
 async function update(req, res) {
+    const user = await User.create({
+        name: req.body.name,
+        username: req.body.username,
+        age: req.body.age,
+    })
     try {
         await User.findByIdAndUpdate(
-            req.params.id,
-            new User(req.body),
+            req.params.userId,
+            { $set: req.body },
+            // { useFindAndModify: true },
             function (err, user) {
-                if (err) return next(err)
-                return res.json(user)
+                if (err) return res.send(err)
+                return res.json({
+                    message: `User by id = ${req.params.userId} updated.`,
+                    result: res.json,
+                })
             }
         )
     } catch (err) {
@@ -87,9 +99,14 @@ async function update(req, res) {
 
 async function deleteUser(req, res) {
     try {
-        await User.findByIdAndDelete(req.params.id, function (err, user) {
-            if (err) return next(err)
-            return res.json(user)
+        await User.findByIdAndDelete({ _id: req.params.userId }, function (
+            err,
+            user
+        ) {
+            if (err) return res.send(err)
+            return res.json({
+                Message: `User ${req.params.userId} deleted from database`,
+            })
         })
     } catch (err) {
         if (err) {
@@ -109,9 +126,9 @@ async function deleteUser(req, res) {
 
 async function deleteAll(req, res) {
     try {
-        await User.deleteAll(function (err, user) {
-            if (err) return next(err)
-            return res.json(user)
+        await User.remove({}, function (err, user) {
+            if (err) return res.send(err)
+            return res.json({ Message: 'All user deleted from database' })
         })
     } catch (err) {
         if (err)

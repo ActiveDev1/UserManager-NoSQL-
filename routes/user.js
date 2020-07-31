@@ -8,10 +8,10 @@ app.get('/', users.findAll)
 
 app.get('/:userId', users.findOne)
 
-// app.put('/:userId', users.update);
+app.put('/:userId', users.update)
 
-// app.delete('/:userId', users.deleteUser);
+app.delete('/:userId', users.deleteUser)
 
-// app.delete('', users.deleteAll);
+app.delete('', users.deleteAll)
 
 module.exports = app
