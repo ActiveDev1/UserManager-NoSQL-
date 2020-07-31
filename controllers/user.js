@@ -70,10 +70,10 @@ async function update(req, res) {
         age: req.body.age,
     })
     try {
-        await User.findByIdAndUpdate(
+        await User.findOneAndUpdate(
             req.params.userId,
             { $set: req.body },
-            // { useFindAndModify: true },
+            {new: false, upsert: false},
             function (err, user) {
                 if (err) return res.send(err)
                 return res.json({
@@ -126,7 +126,7 @@ async function deleteUser(req, res) {
 
 async function deleteAll(req, res) {
     try {
-        await User.remove({}, function (err, user) {
+        await User.deleteMany({}, function (err, user) {
             if (err) return res.send(err)
             return res.json({ Message: 'All user deleted from database' })
         })
