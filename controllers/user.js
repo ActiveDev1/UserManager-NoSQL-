@@ -4,17 +4,11 @@ const { json } = require('body-parser')
 const { use } = require('../routes/user')
 
 async function create(req, res) {
-    if (!req.body) {
-        res.status(400).send({
-            message: 'Content can not be empty!',
-        })
-    }
-
     const user = new User(req.body)
 
     try {
         await user.save(function (err) {
-            if (err) return res.send(err)
+            if (err) return res.json({ Message: err.message })
             return res.json({
                 Message: `User ${req.body.username} Created successfully`,
             })
@@ -64,21 +58,15 @@ async function findOne(req, res) {
 }
 
 async function update(req, res) {
-    const user = await User.create({
-        name: req.body.name,
-        username: req.body.username,
-        age: req.body.age,
-    })
+    const user = User.create(req.body)
     try {
         await User.findOneAndUpdate(
             req.params.userId,
-            { $set: req.body },
-            {new: false, upsert: false},
+            user,
             function (err, user) {
                 if (err) return res.send(err)
                 return res.json({
-                    message: `User by id = ${req.params.userId} updated.`,
-                    result: res.json,
+                    message: `User by id = ${req.params.userId} updated.`
                 })
             }
         )

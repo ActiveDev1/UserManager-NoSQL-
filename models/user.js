@@ -7,20 +7,26 @@ const User = new Schema(
     {
         name: {
             type: String,
-            min: [3, 'Name must have at last 3 character.'],
+            minlength: [3, 'Name must have at last 3 character.'],
             required: [true, 'Name required'],
         },
         username: {
             type: String,
-            min: [5, 'Username must have at last 5 character.'],
-            required: [true, 'Name required'],
+            minlength: [5, 'Username must have at last 5 character.'],
+            required: [true, 'username required'],
         },
         age: {
             type: Number,
-            required: [true, 'Name required'],
+            required: [true, 'age required'],
         },
     },
     { versionKey: false }
 )
 
+
 module.exports = mongoose.model('User', User)
+
+
+// user.Schema.path('name').validate(function (value) {
+//     return value
+// }, 'Name must have at last 3 character.')
