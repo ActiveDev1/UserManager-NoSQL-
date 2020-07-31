@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const config = require('../config')
 
 mongoose.connect(
-    config.db.mongodb,
+    `mongodb://${config.db.mongodb.HOST}:${config.db.mongodb.PORT}/${config.db.mongodb.DB}`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,

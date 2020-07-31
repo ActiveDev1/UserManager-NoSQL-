@@ -14,7 +14,9 @@
             "program": "${workspaceFolder}/server.js",
             "env": {
                 "APP_PORT":"3001",
-                "MONGODB_URI":"mongodb://localhost:27017/NodeDB"
+                // "MONGO_HOST":"localhost",
+                // "MONGO_PORT":"27017",
+                // "MONGO_DB":"NodeDB",
             }
         }
     ]

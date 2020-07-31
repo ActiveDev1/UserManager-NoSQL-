@@ -1,7 +1,5 @@
 const User = require('../models/user')
 const mongoose = require('mongoose')
-const { json } = require('body-parser')
-const { use } = require('../routes/user')
 
 async function create(req, res) {
     const user = new User(req.body)
@@ -15,7 +13,7 @@ async function create(req, res) {
         })
     } catch (err) {
         res.status(500).send({
-            message:
+            Message:
                 err.message || 'Some error occurred while creating the User.',
         })
     }
@@ -29,7 +27,7 @@ async function findAll(req, res) {
         })
     } catch (err) {
         res.status(500).json({
-            message:
+            Message:
                 err.message || 'Some error occurred while retrieving users.',
         })
     }
@@ -45,11 +43,11 @@ async function findOne(req, res) {
         if (err) {
             if (err.kind === 'not_found') {
                 res.status(404).send({
-                    message: `Not found User with id ${req.params.userId}.`,
+                    Message: `Not found User with id ${req.params.userId}.`,
                 })
             } else {
                 res.status(500).send({
-                    message:
+                    Message:
                         'Error retrieving User with id ' + req.params.userId,
                 })
             }
@@ -58,15 +56,19 @@ async function findOne(req, res) {
 }
 
 async function update(req, res) {
-    const user = User.create(req.body)
+    // const user = User.create(req.body)
     try {
         await User.findOneAndUpdate(
             req.params.userId,
-            user,
+            {$set:{
+                name:req.body.name,
+                username:req.body.username,
+                age:req.body.age,
+            }},
             function (err, user) {
                 if (err) return res.send(err)
                 return res.json({
-                    message: `User by id = ${req.params.userId} updated.`
+                    Message: `User by id = ${req.params.userId} updated.`
                 })
             }
         )
@@ -74,11 +76,11 @@ async function update(req, res) {
         if (err) {
             if (err.kind === 'not_found') {
                 res.status(404).send({
-                    message: `Not found User with id ${req.params.userId}.`,
+                    Message: `Not found User with id ${req.params.userId}.`,
                 })
             } else {
                 res.status(500).send({
-                    message: 'Error updating User with id ' + req.params.userId,
+                    Message: 'Error updating User with id ' + req.params.userId,
                 })
             }
         }
@@ -100,11 +102,11 @@ async function deleteUser(req, res) {
         if (err) {
             if (err.kind === 'n ot_found') {
                 res.status(404).send({
-                    message: `Not found User with id ${req.params.userId}.`,
+                    Message: `Not found User with id ${req.params.userId}.`,
                 })
             } else {
                 res.status(500).send({
-                    message:
+                    Message:
                         'Could not delete User with id ' + req.params.userId,
                 })
             }
@@ -121,7 +123,7 @@ async function deleteAll(req, res) {
     } catch (err) {
         if (err)
             res.status(500).send({
-                message:
+                Message:
                     err.message ||
                     'Some error occurred while removing all users.',
             })
