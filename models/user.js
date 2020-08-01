@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const conn = require('./db.js')
 
 const Schema = mongoose.Schema
 

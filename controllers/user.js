@@ -1,64 +1,62 @@
 const User = require('../models/user')
-const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
+const config = require('../config')
 
-async function create(req, res) {
-    const user = new User(req.body)
-
+async function create(req, res, next) {
     try {
-        await user.save(function (err) {
-            if (err) return res.json({ Message: err.message })
-            return res.json({
-                Message: `User ${req.body.username} Created successfully`,
-            })
+        const user = new User(req.body)
+        await user.save()
+        const token = jwt.sign(
+            { _id: user._id },
+            config.credentials.jwtSecret,
+            { expiresIn: 120 }
+        )
+        return res.json({
+            Message: `User ${req.body.username} Created successfully`,
+            Token: token,
         })
     } catch (err) {
-        res.status(500).send({
-            Message:
-                err.message || 'Some error occurred while creating the User.',
-        })
+        next(err)
     }
 }
+// async function create2(req, res, next) {
+//     try {
+//         const newUser = await User.create(req.body)
+//         console.log(newUser._id)
+//         return res.json({
+//             Message: `User ${req.body.username} Created successfully`,
+//         })
+//     } catch (err) {
+//         next(err)
+//     }
+// }
 
-async function findAll(req, res) {
+async function findAll(req, res, next) {
     try {
         await User.find(function (err, user) {
             if (err) return next(err)
             return res.json(user)
         })
     } catch (err) {
-        res.status(500).json({
-            Message:
-                err.message || 'Some error occurred while retrieving users.',
-        })
+        next(err)
     }
 }
 
-async function findOne(req, res) {
+async function findOne(req, res, next) {
     try {
         await User.find({ _id: req.params.userId }, function (err, user) {
             if (err) return res.send(err)
             return res.json(user)
         })
     } catch (err) {
-        if (err) {
-            if (err.kind === 'not_found') {
-                res.status(404).send({
-                    Message: `Not found User with id ${req.params.userId}.`,
-                })
-            } else {
-                res.status(500).send({
-                    Message:
-                        'Error retrieving User with id ' + req.params.userId,
-                })
-            }
-        }
+        return next(err)
     }
 }
 
-async function update(req, res) {
+async function update(req, res, next) {
     try {
         await User.findOneAndUpdate(
-            {_id:req.params.userId},
+            { _id: req.params.userId },
             {
                 $set: {
                     name: req.body.name,
@@ -75,21 +73,11 @@ async function update(req, res) {
             }
         )
     } catch (err) {
-        if (err) {
-            if (err.kind === 'not_found') {
-                res.status(404).send({
-                    Message: `Not found User with id ${req.params.userId}.`,
-                })
-            } else {
-                res.status(500).send({
-                    Message: 'Error updating User with id ' + req.params.userId,
-                })
-            }
-        }
+        return next(err)
     }
 }
 
-async function deleteUser(req, res) {
+async function deleteUser(req, res, next) {
     try {
         await User.findByIdAndDelete({ _id: req.params.userId }, function (
             err,
@@ -101,34 +89,35 @@ async function deleteUser(req, res) {
             })
         })
     } catch (err) {
-        if (err) {
-            if (err.kind === 'n ot_found') {
-                res.status(404).send({
-                    Message: `Not found User with id ${req.params.userId}.`,
-                })
-            } else {
-                res.status(500).send({
-                    Message:
-                        'Could not delete User with id ' + req.params.userId,
-                })
-            }
-        }
+        return next(err)
     }
 }
 
-async function deleteAll(req, res) {
+async function deleteAll(req, res, next) {
     try {
         await User.deleteMany({}, function (err, user) {
             if (err) return res.send(err)
             return res.json({ Message: 'All user deleted from database' })
         })
     } catch (err) {
-        if (err)
-            res.status(500).send({
-                Message:
-                    err.message ||
-                    'Some error occurred while removing all users.',
-            })
+        if (err) return next(err)
+    }
+}
+
+async function getNewToken(req, res, next) {
+    try {
+        const token = jwt.sign(
+            { _id: req.params.userId },
+            config.credentials.jwtSecret,
+            { expiresIn: 120 }
+        )
+
+        await User.find({ _id: req.params.userId }, function (err, user) {
+            if (err) return res.send(err)
+            return res.json({ Token: token })
+        })
+    } catch (err) {
+        if (err) return next(err)
     }
 }
 
@@ -139,4 +128,5 @@ module.exports = {
     update,
     deleteUser,
     deleteAll,
+    getNewToken,
 }
