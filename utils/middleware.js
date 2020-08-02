@@ -1,22 +1,21 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const userDB = require('../models/user');
 
-const config = require('../config')
+async function verifyToken(req, res, next) {
+  try {
+    const authHeader = req.headers['x-access-token'] || req.headers['authentication'] || req.headers['authorization'];
+    if (!authHeader) {
+      return res.status(403).json({ Message: 'No token provided.' });
+    }
 
-function verifyToken(req, res, next) {
-    const authHeader = req.headers['x-access-token']
-
-    if (authHeader == null)
-        return res.status(403).send({ Message: 'No token provided.' })
-
-    jwt.verify(authHeader, config.credentials.jwtSecret, (err, user) => {
-        console.log(err)
-        if (err)
-            return res
-                .status(403)
-                .send({ Message: 'Failed to authenticate token.' })
-        req._id = user._id
-        next()
-    })
+    const payload = jwt.verify(authHeader, config.credentials.jwtSecret)
+        req.user = await userDB.findById(payload._id).lean();
+        next();
+  } catch (err) {
+    console.error(err);
+        if (err) return res.status(401).json({ Message: 'Failed to authenticate token.' });
+  }
 }
 
-module.exports = {verifyToken}
+module.exports = { verifyToken };
