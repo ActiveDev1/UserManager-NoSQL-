@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.get('/', (req, res) => {
     res.json({ message: 'This is a simple of some api for manage user :)' })
 })
-app.use('/users', require('./routes/user'))
+app.use(require('./routes/user'))
 
 app.use((err, req, res, next) => {
     if (err) {
