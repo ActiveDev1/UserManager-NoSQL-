@@ -3,18 +3,20 @@ const app = express()
 const users = require('../controllers/user.js')
 const middlware = require('../utils/middleware.js')
 
-app.post('/', users.create)
+app.post('/users', users.create) 
 
-app.get('/', middlware.verifyToken, users.findAll)
+app.get('/users', middlware.verifyToken, users.findAll) 
 
-app.get('/:userId', middlware.verifyToken , users.findOne)
+app.get('/users/:userId', middlware.verifyToken , users.findOne) 
 
-app.put('/:userId', middlware.verifyToken , users.update)
+app.put('/users/:userId', middlware.verifyToken , users.update) 
 
-app.delete('/:userId',middlware.verifyToken,  users.deleteUser)
+app.delete('/users/:userId',middlware.verifyToken,  users.deleteUser)
 
-app.delete('', middlware.verifyToken, users.deleteAll)
+app.delete('/users', middlware.verifyToken, users.deleteAll) 
 
-app.get('/newToken/:userId', users.getNewToken)
+app.get('/users/newToken/:userId', users.getNewToken) 
+
+app.post('/login', users.login) 
 
 module.exports = app
